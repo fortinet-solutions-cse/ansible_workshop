@@ -1,0 +1,35 @@
+- name: Test API
+  hosts: myfortimanagers
+  gather_facts: no
+  connection: httpapi
+  collections:
+    - fortinet.fortimanager
+  vars:
+    ansible_httpapi_use_ssl: True
+    ansible_httpapi_validate_certs: False
+    ansible_httpapi_port: 443
+    script_name: demoscript
+  tasks:
+    - name: create the script
+      fmgr_dvmdb_script:
+         method: add
+         url_params:
+            adom: none
+         params:
+            - data:
+                - name: "{{ script_name }}"
+                  desc: 'created via ansible'
+                  type: 'cli'
+                  filter_ostype: 'fos'
+                  target: remote_device
+                  content: |
+                    config system ntp
+                      set type custom
+                      set syncinterval 20
+                      config ntpserver
+                        edit 1
+                          set server "10.210.1.1"
+                        next
+                      end
+                      set source-ip 192.168.122.40
+                    end
