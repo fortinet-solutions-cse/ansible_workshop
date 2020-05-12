@@ -1,0 +1,20 @@
+- hosts: fortigates
+  collections:
+  - fortinet.fortios
+  connection: httpapi
+  vars:
+    vdom: "root"
+    ansible_httpapi_use_ssl: no
+    ansible_httpapi_validate_certs: no
+    ansible_httpapi_port: 80
+    license_file: ./license-VM00.lic
+    license_file_content: "{{ lookup( 'file', license_file) }}" 
+    encoded_license: "{{ license_file_content | string | b64encode }}"
+  tasks:
+  - name: Update VM license using uploaded file. Reboots immediately if successful.
+    fortios_system_vmlicense:
+      vdom:  "{{ vdom }}"
+      system_vmlicense:
+        file_content: "{{encoded_license}}" 
+        
+        
