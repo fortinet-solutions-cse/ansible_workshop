@@ -1,0 +1,33 @@
+- hosts: fortigates
+  connection: httpapi
+  collections:
+   - fortinet.fortios
+  vars:
+   vdom: "root"
+   ansible_httpapi_use_ssl: yes
+   ansible_httpapi_validate_certs: no
+   ansible_httpapi_port: 443
+  tasks:
+  - name: Configure devices.
+    fortios_firewall_policy:
+      vdom:  "{{ vdom }}"
+      state: "present"
+      firewall_policy:
+        policyid: 27
+        srcintf:
+          - name: port1
+        dstintf:
+          - name: port1
+        srcaddr:
+          - name: all
+        dstaddr:
+          - name: all
+        action: accept
+        service:
+          - name: ALL
+        name: testPolicy
+        status: enable
+        schedule: always
+        logtraffic: all
+        logtraffic_start: disable
+
