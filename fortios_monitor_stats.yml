@@ -1,0 +1,17 @@
+- hosts: fortigates
+  connection: httpapi
+  collections:
+   - fortinet.fortios
+  vars:
+   vdom: "root"
+   ansible_httpapi_use_ssl: yes
+   ansible_httpapi_validate_certs: no
+   ansible_httpapi_port: 443
+  tasks:
+  - name: Display Stats
+    fortios_json_generic:
+      vdom:  "{{ vdom }}"
+      json_generic:
+        method: "GET"
+        path: "/api/v2/monitor/system/resource/usage"
+
