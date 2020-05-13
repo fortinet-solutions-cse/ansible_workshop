@@ -1,0 +1,46 @@
+- name: Test API
+  hosts: myfortimanagers
+  gather_facts: no
+  connection: httpapi
+  collections:
+    - fortinet.fortimanager
+  vars:
+    ansible_httpapi_use_ssl: True
+    ansible_httpapi_validate_certs: False
+    ansible_httpapi_port: 443
+    script_name: demoscript2
+  tasks:
+    - name: execute the script
+      fmgr_dvmdb_script_execute:
+         loose_validation: true
+         method: exec
+         url_params:
+            adom: root
+         params:
+            # in schema data => workflow
+            - data:
+                  script: "{{ script_name }}"
+                  adom: root
+                  scope:
+                    - name: 'FGT-VM64-KVM'
+                      vdom: 'root'
+      register: execution_task
+ 
+    - name: poll and wait for the task to complete
+      when: execution_task.meta.status.code == 0
+      fmgr_task_task_obj:
+        method: 'get'
+        url_params:
+            # remember it's task, not taskid
+            # https://ansible-galaxy-fortimanager-docs.readthedocs.io/en/galaxy-1.0.2/docgen/fmgr_dvmdb_script_execute.html
+            task: "{{ execution_task.meta.data.task }}"
+
+      register: taskinfo
+      until: taskinfo.meta.data.percent == 100
+      retries: 30
+      delay: 10
+
+    - name: general error check
+      fail:
+        msg: 'see more -vvv'
+      failed_when: execution_task.meta.status.code != 0 or taskinfo.meta.data.num_err != 0
