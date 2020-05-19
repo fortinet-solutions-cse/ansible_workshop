@@ -1,4 +1,4 @@
-- name: Test API
+- name: FortiManager Scripting
   hosts: myfortimanagers
   gather_facts: no
   connection: httpapi
@@ -8,7 +8,7 @@
     ansible_httpapi_use_ssl: True
     ansible_httpapi_validate_certs: False
     ansible_httpapi_port: 443
-    script_name: demoscript2
+    script_name: demoscript
   tasks:
     - name: create the script
       fmgr_dvmdb_script:
