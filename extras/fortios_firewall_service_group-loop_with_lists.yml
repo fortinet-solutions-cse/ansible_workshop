@@ -1,0 +1,31 @@
+- name: FortiOS Loops
+  hosts: fortigates
+  gather_facts: no
+  connection: httpapi
+  collections:
+    - fortinet.fortios
+  vars:
+    ansible_httpapi_use_ssl: True
+    ansible_httpapi_validate_certs: False
+    ansible_httpapi_port: 443
+    servicesGroupList:
+    - serviceGroupName: "servicegroup1"
+      serviceGroupMembersList:
+        - name: "HTTPS"
+        - name: "HTTP"
+    - serviceGroupName: "servicegroup2"
+      serviceGroupMembersList:
+        - name: "RSH"
+        - name: "PING6"
+        
+  tasks:
+  - name: Configure service groups.
+    fortios_firewall_service_group:
+      vdom: "root"
+      firewall_service_group:
+        state: present
+        name: "{{item.serviceGroupName}}"
+        member: "{{item.serviceGroupMembersList}}"
+    with_items:
+      - "{{ servicesGroupList }}"
+
